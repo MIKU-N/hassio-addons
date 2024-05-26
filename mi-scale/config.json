@@ -4,7 +4,7 @@
   "slug": "xiaomi_mi_scale",
   "description": "Read weight measurements from a Xiaomi bathroom scale via Bluetooth (BLE)",
   "url": "https://github.com/MIKU-N/hassio-addons",
-  "image": "miku_n/xiaomi-mi-scale-ha-add-on",
+  "image": "miku114514/xiaomi-mi-scale-ha-add-on",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
   "startup": "application",
   "boot": "auto",
