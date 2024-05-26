@@ -32,7 +32,7 @@ def customUserDecoder(userDict):
 def MQTT_discovery():
     """Published MQTT Discovery information if enabled in options.json"""
     for MQTTUser in (USERS):
-        message = '{"name": "' + MQTTUser.NAME + ' Weight",'
+        message = '{"name": "' + MQTTUser.NAME + ' 体重",'
         message+= '"state_topic": "' + MQTT_PREFIX + '/' + MQTTUser.NAME + '/weight",'
         message+= '"value_template": "{{ value_json.weight }}",'
         message+= '"json_attributes_topic": "' + MQTT_PREFIX + '/' + MQTTUser.NAME + '/weight",'
@@ -76,26 +76,26 @@ def MQTT_publish(weight, unit, mitdatetime, hasImpedance, miimpedance):
 
     lib = Xiaomi_Scale_Body_Metrics.bodyMetrics(calcweight, height, age, sex, 0)
     message = '{'
-    message += '"weight":' + "{:.2f}".format(weight)
-    message += ',"weight_unit":"' + str(unit) + '"'
-    message += ',"bmi":' + "{:.2f}".format(lib.getBMI())
-    message += ',"basal_metabolism":' + "{:.2f}".format(lib.getBMR())
-    message += ',"visceral_fat":' + "{:.2f}".format(lib.getVisceralFat())
+    message += '"重量":' + "{:.2f}".format(weight)
+    message += ',"重量单位":"' + str(unit) + '"'
+    message += ',"BMI身体质量指数":' + "{:.2f}".format(lib.getBMI())
+    message += ',"基本代谢":' + "{:.2f}".format(lib.getBMR())
+    message += ',"内脏脂肪":' + "{:.2f}".format(lib.getVisceralFat())
 
     if hasImpedance:
         lib = Xiaomi_Scale_Body_Metrics.bodyMetrics(calcweight, height, age, sex, int(miimpedance))
-        bodyscale = ['Obese', 'Overweight', 'Thick-set', 'Lack-exercise', 'Balanced', 'Balanced-muscular', 'Skinny', 'Balanced-skinny', 'Skinny-muscular']
-        message += ',"lean_body_mass":' + "{:.2f}".format(lib.getLBMCoefficient())
-        message += ',"body_fat":' + "{:.2f}".format(lib.getFatPercentage())
-        message += ',"water":' + "{:.2f}".format(lib.getWaterPercentage())
-        message += ',"bone_mass":' + "{:.2f}".format(lib.getBoneMass())
-        message += ',"muscle_mass":' + "{:.2f}".format(lib.getMuscleMass())
-        message += ',"protein":' + "{:.2f}".format(lib.getProteinPercentage())
-        message += ',"body_type":"' + str(bodyscale[lib.getBodyType()]) + '"'
-        message += ',"metabolic_age":' + "{:.0f}".format(lib.getMetabolicAge())
-        message += ',"impedance":' + "{:.0f}".format(int(miimpedance))
+        bodyscale = ['肥胖型', '超重型', '壮实型', '缺乏锻炼型', '平衡型', '平衡肌肉型', '偏瘦型', '平衡瘦型', '瘦肌肉型']
+        message += ',"去脂体重":' + "{:.2f}".format(lib.getLBMCoefficient())
+        message += ',"体脂":' + "{:.2f}".format(lib.getFatPercentage())
+        message += ',"水分":' + "{:.2f}".format(lib.getWaterPercentage())
+        message += ',"骨量":' + "{:.2f}".format(lib.getBoneMass())
+        message += ',"肌肉量":' + "{:.2f}".format(lib.getMuscleMass())
+        message += ',"蛋白质":' + "{:.2f}".format(lib.getProteinPercentage())
+        message += ',"体型":"' + str(bodyscale[lib.getBodyType()]) + '"'
+        message += ',"代谢年龄":' + "{:.0f}".format(lib.getMetabolicAge())
+        message += ',"阻值":' + "{:.0f}".format(int(miimpedance))
 
-    message += ',"timestamp":"' + mitdatetime + '"'
+    message += ',"测量时间":"' + mitdatetime + '"'
     message += '}'
     try:
         logging.info(f"Publishing data to topic {MQTT_PREFIX + '/' + name + '/weight'}: {message}")
@@ -315,7 +315,7 @@ async def main(MISCALE_MAC):
                 if unit and isStabilized:
                     if OLD_MEASURE != round(measured, 2) + int(miimpedance):
                         OLD_MEASURE = round(measured, 2) + int(miimpedance)
-                        MQTT_publish(round(measured, 2), unit, str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S+00:00')), hasImpedance, miimpedance)
+                        MQTT_publish(round(measured, 2), unit, str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S')), hasImpedance, miimpedance)
             except:
                 pass
             try:
@@ -332,7 +332,7 @@ async def main(MISCALE_MAC):
                 if unit:
                     if OLD_MEASURE != round(measured, 2):
                         OLD_MEASURE = round(measured, 2)
-                        MQTT_publish(round(measured, 2), unit, str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S+00:00')), "", "")
+                        MQTT_publish(round(measured, 2), unit, str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S')), "", "")
             except:
                 pass
         pass
