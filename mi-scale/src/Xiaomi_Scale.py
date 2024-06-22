@@ -32,7 +32,7 @@ def customUserDecoder(userDict):
 def MQTT_discovery():
     """Published MQTT Discovery information if enabled in options.json"""
     for MQTTUser in (USERS):
-        message = '{"name": "' + MQTTUser.NAME + ' 体重",'
+        message = '{"name": "' + MQTTUser.NAME + ' Weight",'
         message+= '"state_topic": "' + MQTT_PREFIX + '/' + MQTTUser.NAME + '/weight",'
         message+= '"value_template": "{{ value_json.weight }}",'
         message+= '"json_attributes_topic": "' + MQTT_PREFIX + '/' + MQTTUser.NAME + '/weight",'
@@ -47,7 +47,7 @@ def MQTT_discovery():
                         auth={'username':MQTT_USERNAME, 'password':MQTT_PASSWORD},
                         tls=MQTT_TLS
                     )
-    logging.info(f"MQTT Discovery Setup Completed...")
+    logging.info(f"MQTT Discovery 设置完成..")
 
 def check_weight(user, weight):
     return weight > user.GT and weight < user.LT
@@ -58,7 +58,7 @@ def GetAge(d1):
     return abs((d2 - d1).days)/365
     
 def MQTT_publish(weight, unit, mitdatetime, hasImpedance, miimpedance):
-    """Publishes weight data for the selected user"""
+    """检测到体重秤广播……推送已启用的用户体重信息中……"""
     if unit == "lbs": calcweight = round(weight * 0.4536, 2)
     if unit == "jin": calcweight = round(weight * 0.5, 2)
     if unit == "kg": calcweight = weight
@@ -98,7 +98,7 @@ def MQTT_publish(weight, unit, mitdatetime, hasImpedance, miimpedance):
     message += ',"测量时间":"' + mitdatetime + '"'
     message += '}'
     try:
-        logging.info(f"Publishing data to topic {MQTT_PREFIX + '/' + name + '/weight'}: {message}")
+        logging.info(f"推送数据到MQTT...  {MQTT_PREFIX + '/' + name + '/weight'}: {message}")
         publish.single(
             MQTT_PREFIX + '/' + name + '/weight',
             message,
@@ -108,9 +108,9 @@ def MQTT_publish(weight, unit, mitdatetime, hasImpedance, miimpedance):
             auth={'username':MQTT_USERNAME, 'password':MQTT_PASSWORD},
             tls=MQTT_TLS
         )
-        logging.info(f"Data Published ...")
+        logging.info(f"数据推送中 ...")
     except Exception as error:
-        logging.error(f"Could not publish to MQTT: {error}")
+        logging.error(f"推送数据到MQTT失败: {error}")
         raise
 
 
@@ -119,7 +119,7 @@ def MQTT_publish(weight, unit, mitdatetime, hasImpedance, miimpedance):
 # Trying To Load Config From options.json (HA Add-On)
 try:
     with open('/data/options.json') as json_file:
-        sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Loading Config From Add-On Options...\n")
+        sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - 加载扩展配置文件...\n")
         data = json.load(json_file)
         try:
             DEBUG_LEVEL = data["DEBUG_LEVEL"]
@@ -127,15 +127,15 @@ try:
                 DEBUG_LEVEL = DEFAULT_DEBUG_LEVEL
                 logging.basicConfig(format='%(asctime)s - (%(levelname)s) %(message)s', level=DEBUG_LEVEL, datefmt='%Y-%m-%d %H:%M:%S')
                 logging.info(f"-------------------------------------")
-                logging.info(f"Starting Xiaomi mi Scale v{VERSION}...")
-                logging.info(f"Loading Config From Options.json...")
-                logging.warning(f"Invalid logging level provided, defaulting to {DEBUG_LEVEL}...")
+                logging.info(f"启动小米体脂秤插件中... 版本 v{VERSION}...")
+                logging.info(f"加载配置文件 Options.json ...")
+                logging.warning(f"错误的日志级别设置, 使用默认日志级别 {DEBUG_LEVEL}...")
             else:
                 logging.basicConfig(format='%(asctime)s - (%(levelname)s) %(message)s', level=DEBUG_LEVEL, datefmt='%Y-%m-%d %H:%M:%S')
                 logging.info(f"-------------------------------------")
-                logging.info(f"Starting Xiaomi mi Scale v{VERSION}...")
-                logging.info(f"Loading Config From Options.json...")
-                logging.info(f"Logging Level Set to {DEBUG_LEVEL}...")
+                logging.info(f"启动小米体脂秤插件中... 版本 v{VERSION}...")
+                logging.info(f"加载配置文件 Options.json ...")
+                logging.info(f"日志级别设置为 {DEBUG_LEVEL}...")
             # Prevent bleak log flooding
             bleak_logger = logging.getLogger("bleak")
             bleak_logger.setLevel(logging.INFO)
@@ -143,61 +143,61 @@ try:
             DEBUG_LEVEL = DEFAULT_DEBUG_LEVEL
             logging.basicConfig(format='%(asctime)s - (%(levelname)s) %(message)s', level=DEBUG_LEVEL, datefmt='%Y-%m-%d %H:%M:%S')
             logging.info(f"-------------------------------------")
-            logging.info(f"Starting Xiaomi mi Scale v{VERSION}...")
-            logging.info(f"Loading Config From Options.json...")
-            logging.info(f"No Logging Level Provided, Defaulting to  {DEBUG_LEVEL}...")
+            logging.info(f"启动小米体脂秤插件中... 版本 v{VERSION}...")
+            logging.info(f"加载配置文件 Options.json ...")
+            logging.info(f"未配置日志级别, 使用默认日志级别  {DEBUG_LEVEL}...")
             # Prevent bleak log flooding
             bleak_logger = logging.getLogger("bleak")
             bleak_logger.setLevel(logging.INFO)
             pass
         try:
             MISCALE_MAC = data["MISCALE_MAC"]
-            logging.debug(f"MISCALE_MAC read from config: {MISCALE_MAC}")
+            logging.debug(f"从配置文件中读取到的MAC地址为: {MISCALE_MAC}")
 
         except:
-            logging.error(f"MAC Address not provided...")
+            logging.error(f"未找到MAC地址配置...")
             raise
         try:
             MISCALE_VERSION = data["MISCALE_VERSION"]
-            logging.info(f"MISCALE_VERSION option is deprecated and can safely be removed from config...")
+            logging.info(f"MISCALE_VERSION 选项已弃用，建议从配置文件中删除...")
         except:
             pass
         try:
             MQTT_USERNAME = data["MQTT_USERNAME"]
-            logging.debug(f"MQTT_USERNAME read from config: {MQTT_USERNAME}")
+            logging.debug(f"从配置文件中读取 MQTT_USERNAME 的值为: {MQTT_USERNAME}")
         except:
             MQTT_USERNAME = "username"
-            logging.debug(f"MQTT_USERNAME defaulted to: {MQTT_USERNAME}")
+            logging.debug(f"未配置 MQTT_USERNAME 值，使用默认值: {MQTT_USERNAME}")
             pass
         try:
             MQTT_PASSWORD = data["MQTT_PASSWORD"]
-            logging.debug(f"MQTT_PASSWORD read from config: ***")
+            logging.debug(f"从配置文件中读取 MQTT_PASSWORD 的值为: ***")
         except:
             MQTT_PASSWORD = None
-            logging.debug(f"MQTT_PASSWORD defaulted to: {MQTT_PASSWORD}")
+            logging.debug(f"未配置 MQTT_USERNAME 值，使用默认值: {MQTT_PASSWORD}")
             pass
         try:
             MQTT_HOST = data["MQTT_HOST"]
-            logging.debug(f"MQTT_HOST read from config: {MQTT_HOST}")
+            logging.debug(f"从配置文件中读取 MQTT_HOST 的值为: {MQTT_HOST}")
         except:
-            logging.error(f"MQTT Host not provided...")
+            logging.error(f"MQTT Host 值未配置，请检查配置文件...")
             raise
         try:
             MQTT_RETAIN = data["MQTT_RETAIN"]
-            logging.debug(f"MQTT_RETAIN read from config: {MQTT_RETAIN}")
+            logging.debug(f"从配置文件中读取 MQTT_RETAIN 的值为: {MQTT_RETAIN}")
         except:
             MQTT_RETAIN = True
-            logging.debug(f"MQTT_RETAIN defaulted to: {MQTT_RETAIN}")
+            logging.debug(f"已启用 MQTT_USERNAME ，使用值: {MQTT_RETAIN}")
             pass
         try:
             MQTT_PORT = data["MQTT_PORT"]
-            logging.debug(f"MQTT_PORT read from config: {MQTT_PORT}")
+            logging.debug(f"从配置文件中读取 MQTT_PORT 的值为: {MQTT_PORT}")
             if(type(MQTT_PORT) != int):
-                logging.warning(f"Converting MQTT_PORT to integer...")
+                logging.warning(f"将 MQTT_PORT 值转换为整数...")
                 MQTT_PORT = int(MQTT_PORT)
         except:
             MQTT_PORT = 1883
-            logging.debug(f"MQTT_PORT defaulted to: {MQTT_PORT}")
+            logging.debug(f"未配置 MQTT_PORT 值，使用默认值: {MQTT_PORT}")
             pass
         try:
             MQTT_TLS_CACERTS = data["MQTT_TLS_CACERTS"]
@@ -280,8 +280,8 @@ except FileNotFoundError as error:
     logging.basicConfig(format='%(asctime)s - (%(levelname)s) %(message)s', level=DEBUG_LEVEL, datefmt='%Y-%m-%d %H:%M:%S')
     logging.info(f"-------------------------------------")
     logging.info(f"Starting Xiaomi mi Scale v{VERSION}...")
-    logging.info(f"Loading Config From Options.json...")
-    logging.error(f"options.json file missing... {error}")
+    logging.info(f"加载配置文件 Options.json ...")
+    logging.error(f"options.json 文件不存在... {error}")
     # Prevent bleak log flooding
     bleak_logger = logging.getLogger("bleak")
     bleak_logger.setLevel(logging.INFO)

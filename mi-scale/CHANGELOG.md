@@ -1,3 +1,7 @@
+## [0.3.6-mod-2] - 2024-6-22
+### Added
+- 增加部分日志内容汉化
+
 ## [0.3.6] - 2022-10-10
 ### Added
 - Added apparmor Security to support Supervised Installation. (Fixes [67](https://github.com/lolouk44/hassio-addons/issues/67) - Thanks @MariusHerget)
