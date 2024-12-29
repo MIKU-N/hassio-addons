@@ -34,7 +34,7 @@ def MQTT_discovery():
     for MQTTUser in (USERS):
         message = '{"name": "' + MQTTUser.NAME + ' Weight",'
         message+= '"state_topic": "' + MQTT_PREFIX + '/' + MQTTUser.NAME + '/weight",'
-        message+= '"value_template": "{{ value_json.weight }}",'
+        message+= '"value_template": "{{ value_json.重量 }}",'
         message+= '"json_attributes_topic": "' + MQTT_PREFIX + '/' + MQTTUser.NAME + '/weight",'
         message+= '"icon": "mdi:scale-bathroom",'
         message+= '"state_class": "measurement"}'
